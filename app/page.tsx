@@ -1,9 +1,17 @@
-import Image from "next/image";
+import GalaxyAnimation from "@/app/_components/GalaxyAnimation";
+import Logo from "./_components/Logo";
+
 
 export default function Home() {
-  return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      
+  return (   
+
+    <div style={{position: 'relative', width: '100%', height: '100vh', overflow: 'hidden'}}>
+
+      <GalaxyAnimation />
+      <div className="flex flex-col items-center font-sans relative">
+        <div style={{paddingTop: 120}}><Logo /></div>
+        
+      </div>
     </div>
   );
 }
