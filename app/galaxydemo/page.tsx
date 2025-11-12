@@ -77,9 +77,9 @@ function handleChangeSpeed(event: React.ChangeEvent<HTMLInputElement>){
 
         requestAnimationFrame(drawStarfield);
     }
-        
+        // 
         return (<div>
-            <canvas id="canvas" width="800" height="600"></canvas>            
+            <canvas id="canvas" width="1024" height="768" style={{width: "100%"}}></canvas>            
         </div>);
   
 }
