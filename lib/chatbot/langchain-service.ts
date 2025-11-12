@@ -103,11 +103,16 @@ export class LangChainService {
         );
       }
 
-      if (!['openai', 'local'].includes(this.config.backend)) {
+      if (!['openai', 'local', 'api'].includes(this.config.backend)) {
         throw new LangChainServiceError(
           `Unsupported backend type "${this.config.backend}"`,
           ErrorType.CONFIGURATION
         );
+      }
+      
+      // Skip validation for API backend (handled by API route)
+      if (this.config.backend === 'api') {
+        return;
       }
     } catch (error) {
       console.error('Configuration validation failed:', error);
@@ -121,6 +126,12 @@ export class LangChainService {
    */
   private initializeChain(): void {
     try {
+      // Skip initialization for API backend (handled by API route)
+      if (this.config.backend === 'api') {
+        console.log('Using API route backend - skipping LangChain initialization');
+        return;
+      }
+
       // Initialize the appropriate chat model based on backend type
       if (this.config.backend === 'openai') {
         this.model = new ChatOpenAI({

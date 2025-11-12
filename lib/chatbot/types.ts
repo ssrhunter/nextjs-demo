@@ -18,8 +18,8 @@ export interface Message {
  * Configuration for the chatbot backend
  */
 export interface ChatbotConfig {
-  backend: 'openai' | 'local';
-  apiKey?: string; // For OpenAI
+  backend: 'openai' | 'local' | 'api';
+  apiKey?: string; // For OpenAI (not used with 'api' backend)
   modelName: string;
   baseUrl?: string; // For local models
   temperature?: number;

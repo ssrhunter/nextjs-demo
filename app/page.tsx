@@ -9,7 +9,7 @@ export default function Home() {
 
       <GalaxyAnimation />
       <div className="flex flex-col items-center font-sans relative">
-        <div style={{paddingTop: 120}}><Logo /></div>
+        <div style={{paddingTop: 80}}><Logo /></div>
         
       </div>
     </div>
