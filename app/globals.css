@@ -33,3 +33,49 @@ body {
     transform: translateX(100%);
   }
 }
+
+/* Navigation Arrows Styles */
+.navigation-arrows-container {
+  position: fixed;
+  top: 50%;
+  left: 0;
+  right: 0;
+  transform: translateY(-50%);
+  pointer-events: none;
+  z-index: 10;
+}
+
+.arrow-button {
+  position: absolute;
+  pointer-events: auto;
+}
+
+.arrow-button.left {
+  left: max(2rem, calc((100vw - 80rem) / 2 - 4rem));
+}
+
+.arrow-button.right {
+  right: max(2rem, calc((100vw - 80rem) / 2 - 4rem));
+}
+
+/* Responsive positioning for tablets and mobile */
+@media (max-width: 1023px) {
+  .arrow-button.left {
+    left: 1rem;
+  }
+  
+  .arrow-button.right {
+    right: 1rem;
+  }
+}
+
+@media (max-width: 767px) {
+  .arrow-button {
+    padding: 0.75rem;
+  }
+  
+  .arrow-button svg {
+    width: 24px;
+    height: 24px;
+  }
+}

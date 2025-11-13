@@ -1,9 +1,10 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import { Star } from '@/lib/supabase/types';
 import StarCard from '@/app/_components/star-gallery/StarCard';
 import StarGalleryEmpty from '@/app/_components/star-gallery/StarGalleryEmpty';
+import NavigationArrows from '@/app/_components/star-gallery/NavigationArrows';
 
 interface StarGalleryProps {
   stars: Star[];
@@ -14,6 +15,7 @@ export default function StarGallery({ stars }: StarGalleryProps) {
   const [cardScales, setCardScales] = useState<Map<number, number>>(new Map());
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
   const cardRefs = useRef<Map<number, HTMLDivElement>>(new Map());
+  const debounceTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
 
   // Check for reduced motion preference
   useEffect(() => {
@@ -25,7 +27,13 @@ export default function StarGallery({ stars }: StarGalleryProps) {
     };
 
     mediaQuery.addEventListener('change', handleChange);
-    return () => mediaQuery.removeEventListener('change', handleChange);
+    return () => {
+      mediaQuery.removeEventListener('change', handleChange);
+      // Cleanup debounce timeout
+      if (debounceTimeoutRef.current) {
+        clearTimeout(debounceTimeoutRef.current);
+      }
+    };
   }, []);
 
   useEffect(() => {
@@ -111,6 +119,35 @@ export default function StarGallery({ stars }: StarGalleryProps) {
     };
   }, [stars, prefersReducedMotion]);
 
+  // Navigation handler for arrow clicks with debouncing
+  const handleNavigate = useCallback((direction: 'left' | 'right') => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
+    // Debounce to prevent rapid click conflicts
+    if (debounceTimeoutRef.current) {
+      return;
+    }
+
+    const cardWidth = 320; // Width of card (w-80 = 20rem = 320px)
+    const gap = 32; // gap-8 = 2rem = 32px
+    const scrollAmount = cardWidth + gap; // 352px total
+
+    // Scroll by one card width plus gap
+    const scrollDelta = direction === 'left' ? -scrollAmount : scrollAmount;
+    
+    // Use smooth scrolling by default, instant if reduced motion is preferred
+    container.scrollBy({
+      left: scrollDelta,
+      behavior: prefersReducedMotion ? 'auto' : 'smooth',
+    });
+
+    // Set debounce timeout (300ms to allow smooth scroll to complete)
+    debounceTimeoutRef.current = setTimeout(() => {
+      debounceTimeoutRef.current = undefined;
+    }, 300) as NodeJS.Timeout;
+  }, [prefersReducedMotion]);
+
   // Keyboard navigation handler
   const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
     const container = scrollContainerRef.current;
@@ -188,6 +225,11 @@ export default function StarGallery({ stars }: StarGalleryProps) {
           );
         })}
       </div>
+      <NavigationArrows
+        scrollContainerRef={scrollContainerRef}
+        onNavigate={handleNavigate}
+        prefersReducedMotion={prefersReducedMotion}
+      />
     </section>
   );
 }

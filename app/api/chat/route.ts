@@ -4,6 +4,9 @@ import { HumanMessage, AIMessage, SystemMessage } from '@langchain/core/messages
 import { DynamicStructuredTool } from '@langchain/core/tools';
 import { starTools } from '@/lib/chatbot/star-tools';
 
+// Additional documentation and resources
+// LangChain Chatbot: https://chat.langchain.com/?threadId=39e1f6d0-c52e-44bd-b2a6-8c176bc3f235
+
 // Use Node.js runtime for full environment variable access (required for LangSmith)
 export const runtime = 'nodejs';
 
