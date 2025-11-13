@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import Link from 'next/link';
 import { Star } from '@/lib/supabase/types';
 
 interface StarCardProps {
@@ -17,8 +18,13 @@ export default function StarCard({ star, scale, className = '' }: StarCardProps)
       }}
       aria-label={`Star card for ${star.name}`}
     >
-      {/* Card background with space theme */}
-      <div className="bg-gradient-to-br from-slate-900/80 to-indigo-950/80 backdrop-blur-sm border border-indigo-500/30 shadow-lg shadow-indigo-500/20 hover:shadow-indigo-400/40 transition-shadow duration-300">
+      <Link 
+        href={`/star/${star.id}`}
+        className="block focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-offset-2 focus:ring-offset-slate-950 rounded-xl"
+        aria-label={`View details for ${star.name}`}
+      >
+        {/* Card background with space theme */}
+        <div className="bg-gradient-to-br from-slate-900/80 to-indigo-950/80 backdrop-blur-sm border border-indigo-500/30 shadow-lg shadow-indigo-500/20 hover:shadow-indigo-400/40 hover:border-indigo-400/50 transition-all duration-300 cursor-pointer">
         
         {/* Star photo */}
         <div className="relative w-full aspect-video bg-slate-950/50">
@@ -78,6 +84,7 @@ export default function StarCard({ star, scale, className = '' }: StarCardProps)
           )}
         </div>
       </div>
+      </Link>
     </article>
   );
 }

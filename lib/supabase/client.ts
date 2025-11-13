@@ -1,6 +1,5 @@
 import { createBrowserClient as createBrowserSupabaseClient } from '@supabase/ssr';
 import { createServerClient as createServerSupabaseClient } from '@supabase/ssr';
-import { cookies } from 'next/headers';
 import type { SupabaseClient } from '@supabase/supabase-js';
 
 /**
@@ -9,6 +8,9 @@ import type { SupabaseClient } from '@supabase/supabase-js';
  * @throws Error if Supabase configuration is missing
  */
 export async function createServerClient(): Promise<SupabaseClient> {
+  // Import cookies only when needed (inside the function)
+  const { cookies } = await import('next/headers');
+  
   // Validate environment variables
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;

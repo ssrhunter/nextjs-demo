@@ -1,11 +1,12 @@
 'use client';
 
 import { useEffect, useRef, useState, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import { useChatbot } from '@/lib/chatbot/chatbot-context';
 import { LangChainService, formatErrorMessage } from '@/lib/chatbot/langchain-service';
 import { MessageList } from '@/app/_components/MessageList';
 import { MessageInput } from '@/app/_components/MessageInput';
-import { Message, ToolCall } from '@/lib/chatbot/types';
+import { Message, ToolCall, NavigationResult } from '@/lib/chatbot/types';
 
 /**
  * ChatbotInterface component - Main interface for chatbot interactions
@@ -25,6 +26,78 @@ export function ChatbotInterface() {
   // Initialize LangChain service with config
   const serviceRef = useRef<LangChainService | null>(null);
   const [initError, setInitError] = useState<string | null>(null);
+  const router = useRouter();
+  const [pendingNavigation, setPendingNavigation] = useState<NavigationResult | null>(null);
+
+  /**
+   * Detects navigation actions in tool responses
+   * Parses the response text for navigation tool results
+   */
+  const detectNavigationAction = useCallback((responseText: string): NavigationResult | null => {
+    try {
+      // Look for tool result markers in the response
+      const toolResultMatch = responseText.match(/\[Tool: navigate_to_page\]\s*(\{[\s\S]*?\})/);
+      
+      if (toolResultMatch && toolResultMatch[1]) {
+        const toolResult = JSON.parse(toolResultMatch[1]);
+        
+        // Check if this is a navigation result
+        if (toolResult.success && toolResult.action === 'navigate' && toolResult.url) {
+          return toolResult as NavigationResult;
+        }
+      }
+    } catch (error) {
+      console.error('Error parsing navigation action:', error);
+    }
+    
+    return null;
+  }, []);
+
+  /**
+   * Executes navigation to the specified URL
+   */
+  const executeNavigation = useCallback((navResult: NavigationResult) => {
+    try {
+      console.log('Executing navigation:', navResult);
+      router.push(navResult.url);
+      setPendingNavigation(null);
+      
+      // Add confirmation message
+      addMessage({
+        id: `nav-confirm-${Date.now()}`,
+        role: 'system',
+        content: `✓ ${navResult.message}`,
+        timestamp: Date.now(),
+      });
+    } catch (error) {
+      console.error('Navigation error:', error);
+      
+      // Add error message
+      addMessage({
+        id: `nav-error-${Date.now()}`,
+        role: 'system',
+        content: `Failed to navigate: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        timestamp: Date.now(),
+        error: error instanceof Error ? error.message : 'Navigation failed',
+      });
+      
+      setPendingNavigation(null);
+    }
+  }, [router, addMessage]);
+
+  /**
+   * Cancels pending navigation
+   */
+  const cancelNavigation = useCallback(() => {
+    setPendingNavigation(null);
+    
+    addMessage({
+      id: `nav-cancel-${Date.now()}`,
+      role: 'system',
+      content: 'Navigation cancelled',
+      timestamp: Date.now(),
+    });
+  }, [addMessage]);
 
   /**
    * Initialize LangChainService on mount or config change
@@ -125,6 +198,12 @@ export function ChatbotInterface() {
           timestamp: Date.now(),
         };
         addMessage(assistantMessage);
+
+        // Check for navigation actions in the response
+        const navAction = detectNavigationAction(fullResponse);
+        if (navAction) {
+          setPendingNavigation(navAction);
+        }
       } else {
         // Use LangChain service for direct OpenAI/local calls
         if (!serviceRef.current) {
@@ -143,6 +222,12 @@ export function ChatbotInterface() {
           timestamp: Date.now(),
         };
         addMessage(assistantMessage);
+
+        // Check for navigation actions in the response
+        const navAction = detectNavigationAction(fullResponse);
+        if (navAction) {
+          setPendingNavigation(navAction);
+        }
       }
     } catch (error) {
       console.error('Error sending message:', error);
@@ -283,6 +368,45 @@ export function ChatbotInterface() {
         isLoading={isLoading}
         currentToolCall={currentToolCall}
       />
+      
+      {/* Navigation confirmation banner */}
+      {pendingNavigation && !isLoading && (
+        <div className="px-4 py-3 bg-blue-50 border-t border-blue-200" role="alert" aria-live="polite">
+          <div className="flex flex-col gap-2">
+            <div className="flex items-start justify-between">
+              <div className="flex-1">
+                <p className="text-sm font-medium text-blue-900">
+                  Ready to navigate
+                </p>
+                <p className="text-sm text-blue-800 mt-1">
+                  {pendingNavigation.message}
+                </p>
+                <p className="text-xs text-blue-600 mt-1">
+                  Destination: {pendingNavigation.url}
+                </p>
+              </div>
+            </div>
+            <div className="flex gap-2">
+              <button
+                onClick={() => executeNavigation(pendingNavigation)}
+                className="px-3 py-1.5 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
+                aria-label="Confirm navigation"
+                type="button"
+              >
+                Go to page
+              </button>
+              <button
+                onClick={cancelNavigation}
+                className="px-3 py-1.5 text-sm bg-white text-blue-700 border border-blue-300 rounded hover:bg-blue-50 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
+                aria-label="Cancel navigation"
+                type="button"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       
       {/* Error retry banner */}
       {hasRecentError() && !isLoading && (

@@ -3,6 +3,7 @@
  */
 
 import type { ChatbotTheme } from './theme';
+import type { Star } from '../supabase/types';
 
 /**
  * Represents a single message in the conversation
@@ -69,4 +70,28 @@ export interface ChatbotState {
   isOpen: boolean;
   isLoading: boolean;
   currentToolCall: ToolCall | null;
+}
+
+/**
+ * Tool response types for star tools
+ */
+export interface StarQueryResult {
+  success: boolean;
+  stars: Star[];
+  count: number;
+  message?: string;
+}
+
+export interface NavigationResult {
+  success: boolean;
+  action: 'navigate';
+  destination: string;
+  url: string;
+  message: string;
+}
+
+export interface ToolResponse {
+  success: boolean;
+  data: any;
+  error?: string;
 }

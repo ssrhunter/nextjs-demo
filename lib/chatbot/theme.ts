@@ -127,7 +127,7 @@ export const defaultTheme: ChatbotTheme = {
   
   // Container
   containerBorder: 'border-gray-200',
-  containerBg: 'bg-transparent',
+  containerBg: 'bg-gradient-to-br from-slate-900/80 to-indigo-950/80',
   
   // Loading indicator
   loadingDotBg: 'bg-gray-400',

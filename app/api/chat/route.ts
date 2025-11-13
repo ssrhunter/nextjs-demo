@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { ChatOpenAI } from '@langchain/openai';
 import { HumanMessage, AIMessage, SystemMessage } from '@langchain/core/messages';
+import { DynamicStructuredTool } from '@langchain/core/tools';
+import { starTools } from '@/lib/chatbot/star-tools';
 
 export const runtime = 'edge';
 
@@ -28,13 +30,38 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Initialize ChatOpenAI
+    // Convert star tools to LangChain tool format
+    const langchainTools = starTools.map(toolDef => {
+      return new DynamicStructuredTool({
+        name: toolDef.name,
+        description: toolDef.description,
+        schema: toolDef.parameters as any,
+        func: async (input: Record<string, any>) => {
+          try {
+            const result = await toolDef.execute(input);
+            return JSON.stringify(result);
+          } catch (error) {
+            console.error(`Tool execution error in ${toolDef.name}:`, error);
+            const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+            return JSON.stringify({
+              success: false,
+              error: `Tool execution failed: ${errorMessage}`,
+            });
+          }
+        },
+      });
+    });
+
+    // Initialize ChatOpenAI with tool binding
     const model = new ChatOpenAI({
       openAIApiKey: apiKey,
       modelName: 'gpt-4o-mini',
       temperature: 0.7,
       streaming: true,
     });
+
+    // Bind tools to the model using bindTools method
+    const modelWithTools = model.bindTools(langchainTools);
 
     // Build messages array
     const messages = [];
@@ -57,18 +84,141 @@ export async function POST(req: NextRequest) {
     // Add current message
     messages.push(new HumanMessage(message));
 
-    // Stream the response
-    const stream = await model.stream(messages);
+    // First, invoke the model to get complete tool calls (non-streaming)
+    let response = await modelWithTools.invoke(messages);
+    
+    console.log('Initial model response:', {
+      hasToolCalls: !!response.tool_calls,
+      toolCallsLength: response.tool_calls?.length || 0,
+      content: response.content,
+    });
+
+    // Track tool messages and calls for later use
+    const toolMessages: Array<{ role: string; content: string; tool_call_id?: string; toolName: string }> = [];
+    const originalToolCalls = response.tool_calls;
+
+    // Handle tool calls if present - execute them and get final response
+    if (response.tool_calls && response.tool_calls.length > 0) {
+      // Execute all tool calls
+      
+      for (const toolCall of response.tool_calls) {
+        try {
+          console.log('Tool call detected:', {
+            name: toolCall.name,
+            args: toolCall.args,
+            argsType: typeof toolCall.args,
+            argsKeys: toolCall.args ? Object.keys(toolCall.args) : [],
+          });
+          
+          // Find the matching tool
+          const tool = langchainTools.find(t => t.name === toolCall.name);
+          
+          if (tool) {
+            // Ensure args is an object and handle empty/undefined values
+            const args = toolCall.args || {};
+            
+            // Log the args being passed to the tool
+            console.log('Executing tool with args:', JSON.stringify(args, null, 2));
+            
+            // Execute the tool
+            const toolResult = await tool.func(args);
+            console.log('Tool result:', toolResult);
+            
+            // Store tool result for the next model call
+            toolMessages.push({
+              role: 'tool',
+              content: toolResult,
+              tool_call_id: toolCall.id,
+              toolName: toolCall.name,
+            });
+          } else {
+            console.error(`Tool not found: ${toolCall.name}`);
+            toolMessages.push({
+              role: 'tool',
+              content: JSON.stringify({ success: false, error: `Tool "${toolCall.name}" not found` }),
+              tool_call_id: toolCall.id,
+              toolName: toolCall.name,
+            });
+          }
+        } catch (toolError) {
+          console.error('Tool execution error:', toolError);
+          const errorMessage = toolError instanceof Error ? toolError.message : 'Unknown error';
+          toolMessages.push({
+            role: 'tool',
+            content: JSON.stringify({ success: false, error: `Tool execution failed: ${errorMessage}` }),
+            tool_call_id: toolCall.id,
+            toolName: toolCall.name,
+          });
+        }
+      }
+      
+      // Add the assistant's response with tool calls to messages
+      messages.push(new AIMessage({
+        content: response.content || '',
+        tool_calls: response.tool_calls,
+      }));
+      
+      // Add tool results to messages
+      for (const toolMsg of toolMessages) {
+        messages.push({
+          role: 'tool',
+          content: toolMsg.content,
+          tool_call_id: toolMsg.tool_call_id,
+        } as any);
+      }
+      
+      // Get final response from model with tool results
+      console.log('Invoking model with tool results...');
+      response = await modelWithTools.invoke(messages);
+      console.log('Final model response:', { content: response.content });
+      
+      // If the model still doesn't provide content, we need to handle tool results ourselves
+      if (!response.content || response.content.toString().trim() === '') {
+        console.log('Model returned empty content, formatting tool results...');
+        
+        // Check if any tool was a navigation action
+        const navigationResult = toolMessages.find(msg => {
+          try {
+            const parsed = JSON.parse(msg.content);
+            return parsed.action === 'navigate';
+          } catch {
+            return false;
+          }
+        });
+        
+        if (navigationResult) {
+          const navData = JSON.parse(navigationResult.content);
+          response.content = `I'll take you to that page now. ${navData.message || ''}`;
+        } else {
+          // For other tools, create a summary
+          response.content = 'I found the information you requested. Let me know if you need anything else!';
+        }
+      }
+    }
 
     // Create a readable stream for the response
     const encoder = new TextEncoder();
     const readableStream = new ReadableStream({
       async start(controller) {
         try {
-          for await (const chunk of stream) {
-            const content = chunk.content.toString();
-            controller.enqueue(encoder.encode(content));
+          // If there were tool calls, include them in the response for client-side handling
+          if (toolMessages.length > 0) {
+            // Send tool results first (for navigation detection)
+            for (const toolMsg of toolMessages) {
+              const toolOutput = `[Tool: ${toolMsg.toolName}]\n${toolMsg.content}\n\n`;
+              controller.enqueue(encoder.encode(toolOutput));
+            }
           }
+          
+          // Send the final content
+          if (response.content) {
+            const content = response.content.toString();
+            controller.enqueue(encoder.encode(content));
+          } else {
+            // Fallback if still no content
+            controller.enqueue(encoder.encode('I processed your request.'));
+          }
+          
           controller.close();
         } catch (error) {
           console.error('Streaming error:', error);
