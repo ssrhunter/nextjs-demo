@@ -4,7 +4,8 @@ import { HumanMessage, AIMessage, SystemMessage } from '@langchain/core/messages
 import { DynamicStructuredTool } from '@langchain/core/tools';
 import { starTools } from '@/lib/chatbot/star-tools';
 
-export const runtime = 'edge';
+// Use Node.js runtime for full environment variable access (required for LangSmith)
+export const runtime = 'nodejs';
 
 interface ChatMessage {
   role: 'user' | 'assistant' | 'system';
@@ -30,6 +31,15 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Log LangSmith configuration for debugging
+    if (process.env.LANGCHAIN_TRACING_V2 === 'true') {
+      console.log('LangSmith tracing enabled:', {
+        project: process.env.LANGCHAIN_PROJECT,
+        endpoint: process.env.LANGCHAIN_ENDPOINT,
+        hasApiKey: !!process.env.LANGCHAIN_API_KEY,
+      });
+    }
+
     // Convert star tools to LangChain tool format
     const langchainTools = starTools.map(toolDef => {
       return new DynamicStructuredTool({
@@ -53,6 +63,7 @@ export async function POST(req: NextRequest) {
     });
 
     // Initialize ChatOpenAI with tool binding
+    // LangSmith will automatically trace if LANGCHAIN_TRACING_V2=true
     const model = new ChatOpenAI({
       openAIApiKey: apiKey,
       modelName: 'gpt-4o-mini',
@@ -201,16 +212,15 @@ export async function POST(req: NextRequest) {
     const readableStream = new ReadableStream({
       async start(controller) {
         try {
-          // If there were tool calls, include them in the response for client-side handling
+          // Log tool results to console for debugging (not sent to client)
           if (toolMessages.length > 0) {
-            // Send tool results first (for navigation detection)
-            for (const toolMsg of toolMessages) {
-              const toolOutput = `[Tool: ${toolMsg.toolName}]\n${toolMsg.content}\n\n`;
-              controller.enqueue(encoder.encode(toolOutput));
-            }
+            console.log('Tool execution results:', toolMessages.map(msg => ({
+              tool: msg.toolName,
+              result: msg.content,
+            })));
           }
           
-          // Send the final content
+          // Only send the final natural language response to the client
           if (response.content) {
             const content = response.content.toString();
             controller.enqueue(encoder.encode(content));

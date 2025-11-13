@@ -104,7 +104,7 @@ export const defaultTheme: ChatbotTheme = {
   // Input
   inputBorder: 'border-gray-300',
   inputFocusRing: 'focus:ring-blue-500',
-  inputBg: 'bg-white',
+  inputBg: 'bg-gradient-to-br from-slate-900/80 to-indigo-950/80',
   inputDisabledBg: 'bg-gray-100',
   
   // Buttons

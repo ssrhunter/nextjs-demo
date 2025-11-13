@@ -95,9 +95,13 @@ export function ChatbotPopup() {
           transitionProperty: 'transform, opacity, height',
         }}
       >
+        {/* Previously used onMinimize={toggleMinimize} 
+            I didn't like the UX that it provided. 
+            I eliminated the close button and made the min button 
+            execute the toggleOpen functionality instead. */}
         <PopupContainer
-          isMinimized={isMinimized}
-          onMinimize={toggleMinimize}
+          isMinimized={isMinimized}          
+          onMinimize={toggleOpen}
         >
           <ChatbotInterface />
         </PopupContainer>
@@ -142,8 +146,8 @@ export function ChatbotPopup() {
         </button>
       )}
 
-      {/* Close button when popup is open and not minimized */}
-      {isOpen && !isMinimized && (
+      {/* Close button when popup is open and not minimized */}      
+      {/* {isOpen && !isMinimized && (
         <button
           onClick={toggleOpen}
           className={`
@@ -182,7 +186,7 @@ export function ChatbotPopup() {
             />
           </svg>
         </button>
-      )}
+      )} */}
     </>
   );
 }
