@@ -2,8 +2,8 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { Star } from '@/lib/supabase/types';
-import StarCard from './StarCard';
-import StarGalleryEmpty from './StarGalleryEmpty';
+import StarCard from '@/app/_components/star-gallery/StarCard';
+import StarGalleryEmpty from '@/app/_components/star-gallery/StarGalleryEmpty';
 
 interface StarGalleryProps {
   stars: Star[];

@@ -1,7 +1,7 @@
 import { Suspense } from 'react';
 import { getStars } from '@/lib/supabase/stars';
-import StarGallery from './StarGallery';
-import StarGalleryLoading from './StarGalleryLoading';
+import StarGallery from '@/app/_components/star-gallery/StarGallery';
+import StarGalleryLoading from '@/app/_components/star-gallery/StarGalleryLoading';
 
 /**
  * Server Component that fetches star data and renders the StarGallery

@@ -48,8 +48,8 @@ test.describe('RAG Tool - search_stars Database Queries', () => {
     expect(matchingStar).toBeDefined();
   });
 
-  test('should search by star name - Betelgeuse', async () => {
-    const query = 'Betelgeuse';
+  test('should search by star name - Rigel', async () => {
+    const query = 'Rigel';
     const searchPattern = `%${query}%`;
     
     const { data, error } = await supabase
@@ -63,7 +63,7 @@ test.describe('RAG Tool - search_stars Database Queries', () => {
     expect(data!.length).toBeGreaterThan(0);
     
     const matchingStar = data!.find((star: Star) => 
-      star.name.toLowerCase().includes('betelgeuse')
+      star.name.toLowerCase().includes('rigel')
     );
     expect(matchingStar).toBeDefined();
   });
@@ -453,8 +453,8 @@ test.describe('Multi-Tool Workflow - Star Navigation by Name', () => {
   });
 
   test('should complete flow: search for star by name and navigate to detail page', async () => {
-    // Step 1: User asks to see star page by name (e.g., "Show me Betelgeuse")
-    const starName = 'Betelgeuse';
+    // Step 1: User asks to see star page by name (e.g., "Show me Rigel")
+    const starName = 'Rigel';
     
     // Step 2: Chatbot invokes search_stars to get star ID
     const searchPattern = `%${starName}%`;
@@ -608,8 +608,8 @@ test.describe('Multi-Tool Workflow - Star Navigation by Name', () => {
   });
 
   test('should handle partial star name matches', async () => {
-    // User might type partial name like "Betel" instead of "Betelgeuse"
-    const partialName = 'Betel';
+    // User might type partial name like "Rige" instead of "Rigel"
+    const partialName = 'Rige';
     
     const searchPattern = `%${partialName}%`;
     const { data: searchResults, error: searchError } = await supabase

@@ -1,4 +1,6 @@
-# Starbroker your friendly AI assisted star trading site. Need to harness a star for its solar energy? You've come to the right place!
+# Starbroker your friendly AI assisted star trading site. 
+
+Need to harness a star for its solar energy? You've come to the right place! Starbroker's got the best star portfolio in the galaxy!
 
 ## Getting Started
 

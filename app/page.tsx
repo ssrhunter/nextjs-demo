@@ -1,6 +1,6 @@
 import GalaxyAnimation from "@/app/_components/GalaxyAnimation";
-import Logo from "./_components/Logo";
-import StarGalleryContainer from "./_components/StarGalleryContainer";
+import Logo from "@/app/_components/Logo";
+import StarGalleryContainer from "@/app/_components/star-gallery/StarGalleryContainer";
 
 
 export default function Home() {
