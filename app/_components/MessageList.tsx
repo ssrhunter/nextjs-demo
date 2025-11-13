@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from 'react';
 import { Message, ToolCall } from '@/lib/chatbot/types';
+import { useChatbot } from '@/lib/chatbot/chatbot-context';
 
 /**
  * Props for MessageList component
@@ -17,6 +18,7 @@ interface MessageListProps {
  * Handles user/assistant message styling, timestamps, loading states, and tool calls
  */
 export function MessageList({ messages, isLoading, currentToolCall }: MessageListProps) {
+  const { theme } = useChatbot();
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   /**
@@ -70,12 +72,12 @@ export function MessageList({ messages, isLoading, currentToolCall }: MessageLis
               text-sm md:text-base
               ${
                 message.role === 'user'
-                  ? 'bg-blue-600 text-white'
+                  ? `${theme.userMessageBg} ${theme.userMessageText}`
                   : message.role === 'tool'
-                  ? 'bg-purple-100 text-purple-950 border border-purple-300'
+                  ? `${theme.toolMessageBg} ${theme.toolMessageText} border ${theme.toolMessageBorder}`
                   : message.error
-                  ? 'bg-red-100 text-red-950 border border-red-300'
-                  : 'bg-gray-100 text-gray-950'
+                  ? `${theme.errorMessageBg} ${theme.errorMessageText} border ${theme.errorMessageBorder}`
+                  : `${theme.assistantMessageBg} ${theme.assistantMessageText}`
               }
             `}
           >
@@ -122,7 +124,7 @@ export function MessageList({ messages, isLoading, currentToolCall }: MessageLis
           </div>
 
           {/* Timestamp */}
-          <div className="text-[0.65rem] md:text-xs text-gray-500 mt-1 px-1">
+          <div className={`text-[0.65rem] md:text-xs mt-1 px-1 ${theme.timestampText}`}>
             {formatTimestamp(message.timestamp)}
           </div>
         </div>
@@ -131,14 +133,14 @@ export function MessageList({ messages, isLoading, currentToolCall }: MessageLis
       {/* Loading indicator */}
       {isLoading && (
         <div className="flex items-start" role="status" aria-live="polite" aria-label="Assistant is thinking">
-          <div className="bg-gray-100 rounded-lg px-3 py-2.5 md:px-4 md:py-3">
+          <div className={`${theme.assistantMessageBg} rounded-lg px-3 py-2.5 md:px-4 md:py-3`}>
             <div className="flex items-center gap-2">
               <div className="flex gap-1" aria-hidden="true">
-                <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                <span className={`w-2 h-2 ${theme.loadingDotBg} rounded-full animate-bounce`} style={{ animationDelay: '0ms' }} />
+                <span className={`w-2 h-2 ${theme.loadingDotBg} rounded-full animate-bounce`} style={{ animationDelay: '150ms' }} />
+                <span className={`w-2 h-2 ${theme.loadingDotBg} rounded-full animate-bounce`} style={{ animationDelay: '300ms' }} />
               </div>
-              <span className="text-xs md:text-sm text-gray-600">Thinking...</span>
+              <span className={`text-xs md:text-sm ${theme.loadingText}`}>Thinking...</span>
             </div>
           </div>
         </div>

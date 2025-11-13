@@ -842,3 +842,245 @@ If you encounter issues not covered here:
 ## License
 
 This chatbot library is part of your application. Refer to your project's license for usage terms.
+
+
+---
+
+## Theme Customization
+
+The chatbot supports easy theme customization through a centralized configuration system. You can use pre-built themes or create your own custom theme.
+
+### Using Pre-built Themes
+
+The library includes three pre-built themes:
+
+1. **defaultTheme** (Blue) - Default professional blue theme
+2. **greenTheme** - Fresh green theme
+3. **purpleTheme** - Modern purple theme
+
+#### Example: Using a Pre-built Theme
+
+```typescript
+import { ChatbotConfig } from '@/lib/chatbot/types';
+import { greenTheme } from '@/lib/chatbot/theme';
+
+const config: ChatbotConfig = {
+  backend: 'api',
+  modelName: 'gpt-4o-mini',
+  temperature: 0.7,
+  systemPrompt: 'You are a helpful assistant.',
+  theme: greenTheme, // Apply green theme
+};
+```
+
+### Creating a Custom Theme
+
+You can create a completely custom theme by defining a `ChatbotTheme` object:
+
+```typescript
+import { ChatbotTheme } from '@/lib/chatbot/theme';
+
+const myCustomTheme: ChatbotTheme = {
+  // Primary brand colors
+  primary: 'bg-orange-500',
+  primaryHover: 'hover:bg-orange-600',
+  primaryDark: 'bg-orange-600',
+  
+  // Header
+  headerBg: 'bg-gradient-to-r from-orange-500 to-red-500',
+  headerText: 'text-white',
+  headerButtonHover: 'hover:bg-white/20',
+  
+  // Messages
+  userMessageBg: 'bg-orange-600',
+  userMessageText: 'text-white',
+  assistantMessageBg: 'bg-gray-100',
+  assistantMessageText: 'text-gray-950',
+  
+  // Tool messages
+  toolMessageBg: 'bg-purple-100',
+  toolMessageText: 'text-purple-950',
+  toolMessageBorder: 'border-purple-300',
+  
+  // Error messages
+  errorMessageBg: 'bg-red-100',
+  errorMessageText: 'text-red-950',
+  errorMessageBorder: 'border-red-300',
+  
+  // Input
+  inputBorder: 'border-gray-300',
+  inputFocusRing: 'focus:ring-orange-500',
+  inputBg: 'bg-white',
+  inputDisabledBg: 'bg-gray-100',
+  
+  // Buttons
+  sendButtonBg: 'bg-orange-500',
+  sendButtonHover: 'hover:bg-orange-600',
+  sendButtonText: 'text-white',
+  sendButtonDisabledBg: 'bg-gray-300',
+  sendButtonDisabledText: 'text-gray-500',
+  
+  // FAB (Floating Action Button)
+  fabBg: 'bg-gradient-to-r from-orange-500 to-red-500',
+  fabHover: 'hover:from-orange-600 hover:to-red-600',
+  fabText: 'text-white',
+  fabRing: 'focus:ring-orange-300',
+  
+  // Close button
+  closeBg: 'bg-gray-800',
+  closeHover: 'hover:bg-gray-900',
+  closeText: 'text-white',
+  
+  // Container
+  containerBorder: 'border-gray-200',
+  containerBg: 'bg-transparent',
+  
+  // Loading indicator
+  loadingDotBg: 'bg-gray-400',
+  loadingText: 'text-gray-600',
+  
+  // Timestamps
+  timestampText: 'text-gray-500',
+};
+
+// Use in config
+const config: ChatbotConfig = {
+  backend: 'api',
+  modelName: 'gpt-4o-mini',
+  theme: myCustomTheme,
+};
+```
+
+### Theme Properties Reference
+
+| Property | Description | Example |
+|----------|-------------|---------|
+| `primary` | Primary brand color | `'bg-blue-500'` |
+| `primaryHover` | Primary hover state | `'hover:bg-blue-600'` |
+| `primaryDark` | Darker primary shade | `'bg-blue-600'` |
+| `headerBg` | Header background | `'bg-gradient-to-r from-blue-500 to-blue-600'` |
+| `headerText` | Header text color | `'text-white'` |
+| `headerButtonHover` | Header button hover | `'hover:bg-white/20'` |
+| `userMessageBg` | User message bubble background | `'bg-blue-600'` |
+| `userMessageText` | User message text color | `'text-white'` |
+| `assistantMessageBg` | Assistant message bubble background | `'bg-gray-100'` |
+| `assistantMessageText` | Assistant message text color | `'text-gray-950'` |
+| `toolMessageBg` | Tool message background | `'bg-purple-100'` |
+| `toolMessageText` | Tool message text | `'text-purple-950'` |
+| `toolMessageBorder` | Tool message border | `'border-purple-300'` |
+| `errorMessageBg` | Error message background | `'bg-red-100'` |
+| `errorMessageText` | Error message text | `'text-red-950'` |
+| `errorMessageBorder` | Error message border | `'border-red-300'` |
+| `inputBorder` | Input field border | `'border-gray-300'` |
+| `inputFocusRing` | Input focus ring | `'focus:ring-blue-500'` |
+| `inputBg` | Input background | `'bg-white'` |
+| `inputDisabledBg` | Disabled input background | `'bg-gray-100'` |
+| `sendButtonBg` | Send button background | `'bg-blue-500'` |
+| `sendButtonHover` | Send button hover | `'hover:bg-blue-600'` |
+| `sendButtonText` | Send button text | `'text-white'` |
+| `sendButtonDisabledBg` | Disabled send button background | `'bg-gray-300'` |
+| `sendButtonDisabledText` | Disabled send button text | `'text-gray-500'` |
+| `fabBg` | Floating action button background | `'bg-gradient-to-r from-blue-500 to-blue-600'` |
+| `fabHover` | FAB hover state | `'hover:from-blue-600 hover:to-blue-700'` |
+| `fabText` | FAB text color | `'text-white'` |
+| `fabRing` | FAB focus ring | `'focus:ring-blue-300'` |
+| `closeBg` | Close button background | `'bg-gray-800'` |
+| `closeHover` | Close button hover | `'hover:bg-gray-900'` |
+| `closeText` | Close button text | `'text-white'` |
+| `containerBorder` | Container border | `'border-gray-200'` |
+| `containerBg` | Container background | `'bg-transparent'` |
+| `loadingDotBg` | Loading dots color | `'bg-gray-400'` |
+| `loadingText` | Loading text color | `'text-gray-600'` |
+| `timestampText` | Timestamp text color | `'text-gray-500'` |
+
+### Theme Best Practices
+
+1. **Use Tailwind Classes**: All theme properties should use Tailwind CSS utility classes
+2. **Maintain Contrast**: Ensure sufficient contrast between text and backgrounds for accessibility
+3. **Test Responsiveness**: Verify your theme works on mobile and desktop
+4. **Brand Consistency**: Match your theme to your brand colors
+5. **Dark Mode**: Consider creating separate themes for light and dark modes
+
+### Example: Brand-Matched Theme
+
+```typescript
+// Match your company's brand colors
+const brandTheme: ChatbotTheme = {
+  primary: 'bg-[#FF6B35]', // Your brand primary color
+  primaryHover: 'hover:bg-[#E55A2B]',
+  primaryDark: 'bg-[#CC4A1F]',
+  
+  headerBg: 'bg-[#FF6B35]',
+  headerText: 'text-white',
+  headerButtonHover: 'hover:bg-black/10',
+  
+  userMessageBg: 'bg-[#FF6B35]',
+  userMessageText: 'text-white',
+  assistantMessageBg: 'bg-gray-50',
+  assistantMessageText: 'text-gray-900',
+  
+  // ... rest of theme properties
+};
+```
+
+### Dynamic Theme Switching
+
+You can switch themes dynamically by updating the config:
+
+```typescript
+'use client';
+
+import { useState } from 'react';
+import { ChatbotProvider } from '@/lib/chatbot/chatbot-context';
+import { defaultTheme, greenTheme, purpleTheme } from '@/lib/chatbot/theme';
+
+export function App() {
+  const [currentTheme, setCurrentTheme] = useState(defaultTheme);
+  
+  const config = {
+    backend: 'api',
+    modelName: 'gpt-4o-mini',
+    theme: currentTheme,
+  };
+  
+  return (
+    <ChatbotProvider config={config}>
+      <div>
+        <button onClick={() => setCurrentTheme(defaultTheme)}>Blue</button>
+        <button onClick={() => setCurrentTheme(greenTheme)}>Green</button>
+        <button onClick={() => setCurrentTheme(purpleTheme)}>Purple</button>
+      </div>
+      {/* Your app content */}
+    </ChatbotProvider>
+  );
+}
+```
+
+### Exporting Your Custom Theme
+
+Save your custom theme in a separate file for reusability:
+
+```typescript
+// lib/chatbot/custom-themes.ts
+import { ChatbotTheme } from './theme';
+
+export const companyTheme: ChatbotTheme = {
+  // Your custom theme configuration
+};
+
+export const darkModeTheme: ChatbotTheme = {
+  // Dark mode theme configuration
+};
+```
+
+Then import and use:
+
+```typescript
+import { companyTheme } from '@/lib/chatbot/custom-themes';
+
+const config: ChatbotConfig = {
+  backend: 'api',
+  modelName: 'gpt-4o-mini',
+  theme: companyTheme,
+};
+```

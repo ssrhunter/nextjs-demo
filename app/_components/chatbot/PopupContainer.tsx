@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { useChatbot } from '@/lib/chatbot/chatbot-context';
 
 interface PopupContainerProps {
   isMinimized: boolean;
@@ -9,14 +10,16 @@ interface PopupContainerProps {
 }
 
 export function PopupContainer({ isMinimized, onMinimize, children }: PopupContainerProps) {
+  const { theme } = useChatbot();
+  
   return (
-    <div className="flex flex-col bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden h-full">
+    <div className={`flex flex-col rounded-lg shadow-lg border overflow-hidden h-full ${theme.containerBg} ${theme.containerBorder}`}>
       {/* Header */}
-      <div className="flex items-center justify-between px-3 py-2.5 md:px-4 md:py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white">
+      <div className={`flex items-center justify-between px-3 py-2.5 md:px-4 md:py-3 ${theme.headerBg} ${theme.headerText}`}>
         <h2 className="text-base md:text-lg font-semibold">Chat Assistant</h2>
         <button
           onClick={onMinimize}
-          className="flex items-center justify-center w-11 h-11 min-w-[2.75rem] min-h-[2.75rem] rounded-full hover:bg-white/20 transition-colors focus:outline-none focus:ring-2 focus:ring-white/50"
+          className={`flex items-center justify-center w-11 h-11 min-w-[2.75rem] min-h-[2.75rem] rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-white/50 ${theme.headerButtonHover}`}
           aria-label={isMinimized ? 'Expand chat' : 'Minimize chat'}
           type="button"
         >
@@ -50,7 +53,7 @@ export function PopupContainer({ isMinimized, onMinimize, children }: PopupConta
 
       {/* Content Area - Conditionally rendered based on isMinimized */}
       {!isMinimized && (
-        <div className="flex-1 overflow-hidden">
+        <div className={`flex-1 overflow-hidden ${theme.containerBg}`}>
           {children}
         </div>
       )}

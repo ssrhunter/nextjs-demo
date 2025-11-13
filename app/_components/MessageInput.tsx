@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, KeyboardEvent, ChangeEvent } from 'react';
+import { useChatbot } from '@/lib/chatbot/chatbot-context';
 
 /**
  * Props for MessageInput component
@@ -15,6 +16,7 @@ interface MessageInputProps {
  * Handles message submission with Enter key and validation
  */
 export function MessageInput({ onSend, disabled }: MessageInputProps) {
+  const { theme } = useChatbot();
   const [input, setInput] = useState('');
 
   /**
@@ -54,7 +56,7 @@ export function MessageInput({ onSend, disabled }: MessageInputProps) {
   };
 
   return (
-    <div className="flex gap-2 p-3 md:p-4 border-t border-gray-200">
+    <div className={`flex gap-2 p-3 md:p-4 border-t ${theme.containerBorder}`}>
       <textarea
         value={input}
         onChange={handleChange}
@@ -63,10 +65,11 @@ export function MessageInput({ onSend, disabled }: MessageInputProps) {
         placeholder="Type your message..."
         rows={1}
         className={`
-          flex-1 resize-none rounded-lg border border-gray-300 px-3 py-2
+          flex-1 resize-none rounded-lg border px-3 py-2
           text-sm md:text-base
-          focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
-          ${disabled ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : 'bg-white'}
+          focus:outline-none focus:ring-2 focus:border-transparent
+          ${theme.inputBorder} ${theme.inputFocusRing}
+          ${disabled ? `${theme.inputDisabledBg} text-gray-500 cursor-not-allowed` : theme.inputBg}
         `}
         style={{
           minHeight: '40px',
@@ -83,8 +86,8 @@ export function MessageInput({ onSend, disabled }: MessageInputProps) {
           min-w-[3.5rem] min-h-[2.75rem]
           ${
             disabled || !input.trim()
-              ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-              : 'bg-blue-500 text-white hover:bg-blue-600 active:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-300'
+              ? `${theme.sendButtonDisabledBg} ${theme.sendButtonDisabledText} cursor-not-allowed`
+              : `${theme.sendButtonBg} ${theme.sendButtonText} ${theme.sendButtonHover} active:opacity-90 focus:outline-none focus:ring-2 ${theme.fabRing}`
           }
         `}
         aria-label="Send message"

@@ -2,6 +2,8 @@
  * Type definitions for the chatbot system
  */
 
+import type { ChatbotTheme } from './theme';
+
 /**
  * Represents a single message in the conversation
  */
@@ -25,6 +27,7 @@ export interface ChatbotConfig {
   temperature?: number;
   tools?: ToolDefinition[];
   systemPrompt?: string;
+  theme?: ChatbotTheme; // Optional theme configuration
 }
 
 /**

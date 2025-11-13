@@ -18,7 +18,7 @@ import { ChatbotInterface } from './ChatbotInterface';
  * - Integrates PopupContainer and ChatbotInterface
  */
 export function ChatbotPopup() {
-  const { isOpen, isMinimized, toggleMinimize, toggleOpen } = useChatbot();
+  const { isOpen, isMinimized, toggleMinimize, toggleOpen, theme } = useChatbot();
   const popupRef = useRef<HTMLDivElement>(null);
   const previousFocusRef = useRef<HTMLElement | null>(null);
 
@@ -107,20 +107,20 @@ export function ChatbotPopup() {
       {!isOpen && (
         <button
           onClick={toggleOpen}
-          className="
+          className={`
             fixed z-50
-            bg-gradient-to-r from-blue-500 to-blue-600
-            text-white rounded-full shadow-lg
+            ${theme.fabBg}
+            ${theme.fabText} rounded-full shadow-lg
             flex items-center justify-center
-            hover:from-blue-600 hover:to-blue-700
+            ${theme.fabHover}
             transition-all duration-200
-            focus:outline-none focus:ring-4 focus:ring-blue-300
+            focus:outline-none focus:ring-4 ${theme.fabRing}
             active:scale-95
             
             // Mobile: 56px touch target, bottom-right with margin
             bottom-4 right-4
             w-14 h-14 min-w-[3.5rem] min-h-[3.5rem]
-          "
+          `}
           aria-label="Open chat assistant"
           type="button"
         >
@@ -146,11 +146,11 @@ export function ChatbotPopup() {
       {isOpen && !isMinimized && (
         <button
           onClick={toggleOpen}
-          className="
+          className={`
             fixed z-50
-            bg-gray-800 text-white rounded-full shadow-md
+            ${theme.closeBg} ${theme.closeText} rounded-full shadow-md
             flex items-center justify-center
-            hover:bg-gray-900
+            ${theme.closeHover}
             transition-all duration-200
             focus:outline-none focus:ring-2 focus:ring-gray-600
             opacity-70 hover:opacity-100
@@ -158,7 +158,7 @@ export function ChatbotPopup() {
             // Mobile: positioned at top of popup
             right-4
             w-10 h-10 min-w-[2.75rem] min-h-[2.75rem]
-          "
+          `}
           style={{
             // Dynamic positioning based on viewport
             bottom: 'calc(min(100vh - 1rem, 80vh) + 0.5rem)',

@@ -50,6 +50,20 @@ export function ChatbotInterface() {
   }, [config, addMessage]);
 
   /**
+   * Add greeting message when chat is first opened (no messages)
+   */
+  useEffect(() => {
+    if (messages.length === 0 && !initError) {
+      addMessage({
+        id: `greeting-${Date.now()}`,
+        role: 'assistant',
+        content: "Hello! I'm your star energy consultant. I'm here to help you find the perfect star to meet your energy needs. Whether you're looking for a reliable main sequence star or something more powerful, I can guide you through our stellar catalog. What kind of energy requirements do you have?",
+        timestamp: Date.now(),
+      });
+    }
+  }, [messages.length, initError, addMessage]);
+
+  /**
    * Handles message submission with streaming and tool calling support
    */
   const handleSendMessage = useCallback(async (messageContent: string) => {
@@ -247,7 +261,7 @@ export function ChatbotInterface() {
   // Show initialization error if present
   if (initError && messages.length === 0) {
     return (
-      <div className="flex flex-col h-full">
+      <div className="flex flex-col h-full ">
         <div className="flex-1 flex items-center justify-center p-4">
           <div className="bg-red-100 border border-red-300 rounded-lg p-4 max-w-md">
             <h3 className="text-red-900 font-medium mb-2">Configuration Error</h3>
@@ -263,7 +277,7 @@ export function ChatbotInterface() {
   }
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full bg-transparent">
       <MessageList
         messages={messages}
         isLoading={isLoading}

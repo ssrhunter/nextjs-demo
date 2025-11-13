@@ -7,6 +7,11 @@ import { ChatbotConfig } from '@/lib/chatbot/types';
 /**
  * Default chatbot configuration
  * Uses API route for secure server-side communication
+ * 
+ * To customize the theme, import a theme from '@/lib/chatbot/theme' and add it to the config:
+ * import { greenTheme, purpleTheme } from '@/lib/chatbot/theme';
+ * 
+ * Then add: theme: greenTheme
  */
 const defaultConfig: ChatbotConfig = {
   backend: 'api',
@@ -15,6 +20,7 @@ const defaultConfig: ChatbotConfig = {
   temperature: 0.7,
   systemPrompt: 'You are a helpful AI assistant who works as a star salesman. You help customers choose the right star which will help them satisfy their energy needs. The stars provide energy similar to how solar power works. Provide clear, concise, and accurate responses.',
   tools: [],
+  // theme: greenTheme, // Uncomment and import to use a different theme
 };
 
 /**

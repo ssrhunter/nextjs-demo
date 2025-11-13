@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
 import { Message, ChatbotConfig, ToolCall, ChatbotState } from './types';
+import { defaultTheme, type ChatbotTheme } from './theme';
 
 /**
  * Persisted state structure with version for migration support
@@ -24,6 +25,7 @@ interface ChatbotContextValue {
   isLoading: boolean;
   currentToolCall: ToolCall | null;
   config: ChatbotConfig;
+  theme: ChatbotTheme;
   
   // Actions
   addMessage: (message: Message) => void;
@@ -199,6 +201,7 @@ export function ChatbotProvider({ children, config }: ChatbotProviderProps) {
     isLoading,
     currentToolCall,
     config,
+    theme: config.theme || defaultTheme,
     addMessage,
     toggleMinimize,
     toggleOpen,
